@@ -213,7 +213,7 @@
     color: #c084fc;
 }
 
-html[data-theme="light-studio"] .pill-ai {
+html[data-theme="apple-music"] .pill-ai {
     color: #7e22ce;
 }
 
@@ -231,7 +231,7 @@ html[data-theme="light-studio"] .pill-ai {
     cursor: pointer;
 }
 
-html[data-theme="light-studio"] .pill-project {
+html[data-theme="apple-music"] .pill-project {
     color: #0284c7;
 }
 

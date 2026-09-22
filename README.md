@@ -2,6 +2,10 @@
 
 A lightweight, portable, offline desktop application for managing local audio libraries, musical metadata (BPM, key, scale, genres, albums, multi-alias artists), and playback — built with **Python**, **SQLite**, **Bottle**, and **pywebview** (native WebView2).
 
+
+
+![](./demo.png)
+
 ---
 
 ## Features
