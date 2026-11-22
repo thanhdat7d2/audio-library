@@ -1,0 +1,179 @@
+<!-- Add / Import View -->
+<div id="view-import" class="view-panel hidden">
+    <h1 class="view-title">Add &amp; Import Tracks</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 16px;">Add a song with or without an audio file, or batch-import songs from a spreadsheet.</p>
+
+    <div class="view-tabs">
+        <button type="button" class="view-tab active" id="tab-btn-single" onclick="switchImportTab('single')">
+            <i class="fa-solid fa-music"></i> Single Song
+        </button>
+        <button type="button" class="view-tab" id="tab-btn-spreadsheet" onclick="switchImportTab('spreadsheet')">
+            <i class="fa-solid fa-table"></i> Import from Spreadsheet
+        </button>
+    </div>
+
+    <!-- Tab 1: Single Song -->
+    <div id="import-tab-single" class="import-layout">
+        <div class="dropzone-container glass-panel" id="import-dropzone">
+            <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+            <h3>Select Audio File <span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(Optional)</span></h3>
+            <p style="color: var(--text-secondary); font-size: 13px; max-width: 300px;">
+                Click to choose an audio file (MP3, WAV, FLAC, OGG), or leave empty to register a song before you have the audio file.
+            </p>
+            <div id="selected-file-details" class="hidden" style="margin-top: 10px; text-align: left; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); width: 100%;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight: 600; font-size: 12px;">Selected File:</span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-import-file">Clear</button>
+                </div>
+                <p id="selected-file-name" style="font-size: 13px; color: var(--accent); margin-top: 4px; word-break: break-all;"></p>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 24px;">
+            <form class="import-form" id="import-song-form">
+                <div class="form-group">
+                    <label class="form-label">Song Title *</label>
+                    <input type="text" class="form-input" id="import-song-title" placeholder="e.g. Moonlight Sonata">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Main Artist(s)</label>
+                    <input type="text" class="form-input" id="import-main-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
+                    <datalist id="artists-datalist"></datalist>
+                    <div class="selected-artists-list" id="badge-main-artists"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Featured Artist(s)</label>
+                    <input type="text" class="form-input" id="import-feat-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
+                    <div class="selected-artists-list" id="badge-feat-artists"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Album</label>
+                        <input type="text" class="form-input" id="import-album" placeholder="None / Single / Type name..." list="albums-datalist">
+                        <datalist id="albums-datalist"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Track Number</label>
+                        <input type="number" class="form-input" id="import-track-no" placeholder="Auto" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Key</label>
+                        <select class="select-input form-input" id="import-key">
+                            <option value="">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Scale</label>
+                        <select class="select-input form-input" id="import-scale">
+                            <option value="">Unknown</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tempo (BPM)</label>
+                        <input type="number" class="form-input" id="import-tempo" placeholder="e.g. 120" min="20" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Release Date</label>
+                        <input type="date" class="form-input" id="import-release-date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Genres</label>
+                    <input type="text" class="form-input" id="import-genres-input" placeholder="Type genre and press Enter..." list="genres-datalist">
+                    <datalist id="genres-datalist"></datalist>
+                    <div class="selected-artists-list" id="badge-genres"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tags</label>
+                    <label class="ai-toggle-row">
+                        <span><i class="fa-solid fa-wand-magic-sparkles"></i> Mark as <strong>AI Generated</strong></span>
+                        <input type="checkbox" id="import-ai-generated">
+                    </label>
+                    <input type="text" class="form-input" id="import-tags-input" placeholder="Type tag (e.g. Remix, Demo, WIP) and press Enter..." list="tags-datalist">
+                    <datalist id="tags-datalist"></datalist>
+                    <div class="selected-artists-list" id="badge-tags"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Music Production Project Path (Optional)</label>
+                    <div class="path-picker-row">
+                        <input type="text" class="form-input" id="import-project-path" placeholder="Path to DAW project folder or file...">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-import-project-folder" title="Browse folder">
+                            <i class="fa-solid fa-folder"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-import-project-file" title="Browse project file">
+                            <i class="fa-solid fa-file"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-submit-import-song" style="margin-top: 10px;">
+                    <i class="fa-solid fa-plus"></i> Register Track (No Audio Yet)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 2: Import from Spreadsheet -->
+    <div id="import-tab-spreadsheet" class="spreadsheet-panel hidden">
+        <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+            <div>
+                <h3 style="font-family: var(--font-heading); margin-bottom: 6px;">Batch Import from Spreadsheet</h3>
+                <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.5;">
+                    Supports <strong>.csv</strong>, <strong>.tsv</strong>, and <strong>.xlsx</strong> files.
+                    Columns such as <code>song_name</code>, <code>main_artists</code>, <code>featured_artists</code>, <code>album</code>, <code>genres</code>, <code>tags</code>, <code>ai_generated</code>, <code>key</code>, <code>scale</code>, <code>tempo</code>, <code>release_date</code>, <code>file_path</code> (optional), and <code>project_path</code> are matched automatically.
+                </p>
+            </div>
+
+            <div class="spreadsheet-actions">
+                <button type="button" class="btn btn-primary" id="btn-select-spreadsheet">
+                    <i class="fa-solid fa-file-excel"></i> Choose Spreadsheet
+                </button>
+                <button type="button" class="btn btn-secondary" id="btn-download-template">
+                    <i class="fa-solid fa-download"></i> Save CSV Template
+                </button>
+                <span id="selected-spreadsheet-name" style="font-size: 13px; color: var(--accent);"></span>
+            </div>
+
+            <div id="spreadsheet-preview-container" class="hidden" style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span id="spreadsheet-preview-meta" style="font-size: 13px; color: var(--text-secondary);"></span>
+                    <button type="button" class="btn btn-primary" id="btn-run-spreadsheet-import">
+                        <i class="fa-solid fa-file-import"></i> Import All Rows
+                    </button>
+                </div>
+
+                <div class="songs-table-container">
+                    <table class="songs-table">
+                        <thead>
+                            <tr>
+                                <th>Row</th>
+                                <th>Song Name</th>
+                                <th>Artists</th>
+                                <th>Album</th>
+                                <th>Genres</th>
+                                <th>Tags</th>
+                                <th>Audio</th>
+                                <th>Project</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spreadsheet-preview-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="spreadsheet-result-box" class="import-summary-box hidden"></div>
+        </div>
+    </div>
+</div>

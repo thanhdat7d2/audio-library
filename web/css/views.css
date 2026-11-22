@@ -1,0 +1,265 @@
+/* Setup / Welcome Panel */
+.setup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+    gap: 24px;
+    padding: 40px;
+}
+
+.setup-icon {
+    font-size: 64px;
+    color: var(--accent);
+    filter: drop-shadow(0 0 12px var(--accent-glow));
+}
+
+.setup-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.setup-desc {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Dashboard */
+.view-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 26px;
+    margin-bottom: 4px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.stat-val {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Songs & Projects Tables */
+.songs-table-container {
+    overflow-x: auto;
+}
+
+.songs-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.songs-table th {
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.songs-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+}
+
+.songs-table tr {
+    cursor: pointer;
+    transition: background var(--transition-speed);
+}
+
+.songs-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.songs-table tr.playing {
+    background-color: rgba(16, 185, 129, 0.08);
+}
+
+.songs-table tr.playing td:first-child {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.btn-play-row {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color var(--transition-speed);
+}
+
+.songs-table tr:hover .btn-play-row {
+    color: var(--accent);
+}
+
+/* Media Grid (Artists, Albums) */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+}
+
+.media-card {
+    padding: 12px;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    text-align: center;
+}
+
+.media-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+}
+
+.media-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.media-card-artist .media-img {
+    border-radius: 50%;
+}
+
+.media-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.media-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.media-project-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+}
+
+/* Import & Spreadsheet Views */
+.import-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+
+.dropzone-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    gap: 16px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.01);
+    transition: all var(--transition-speed);
+}
+
+.dropzone-container:hover {
+    border-color: var(--accent);
+    background: rgba(16, 185, 129, 0.02);
+}
+
+.dropzone-icon {
+    font-size: 48px;
+    color: var(--text-muted);
+}
+
+.linked-projects-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+}
+
+.linked-project-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.linked-project-path {
+    color: var(--text-secondary);
+    font-family: monospace;
+    font-size: 11px;
+    word-break: break-all;
+}
+
+.spreadsheet-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.spreadsheet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.import-summary-box {
+    padding: 16px;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.import-error-list {
+    margin-top: 8px;
+    padding-left: 18px;
+    color: #fca5a5;
+    font-size: 12px;
+    max-height: 140px;
+    overflow-y: auto;
+}

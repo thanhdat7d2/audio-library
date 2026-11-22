@@ -2,6 +2,7 @@
 doc/
 
 # Runtime local configuration & user library data
+app_settings.json
 app_settings.txt
 data/
 *.db

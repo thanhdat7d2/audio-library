@@ -1,0 +1,268 @@
+<!-- Create / Edit Artist Modal -->
+<div class="modal-overlay" id="modal-artist">
+    <div class="modal-content glass-panel">
+        <div class="modal-header">
+            <h3 class="modal-title" id="artist-modal-title">Add New Artist</h3>
+            <button class="modal-close" onclick="closeModal('modal-artist')">&times;</button>
+        </div>
+        <form id="form-create-artist">
+            <input type="hidden" id="artist-edit-slug">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Artist Name / Alias</label>
+                <input type="text" class="form-input" id="artist-name" placeholder="e.g. Claude Debussy" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Real Name</label>
+                <input type="text" class="form-input" id="artist-real-name" placeholder="e.g. Achille-Claude Debussy">
+            </div>
+            <div class="form-row" style="margin-bottom: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-input" id="artist-dob">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <select class="select-input form-input" id="artist-country">
+                        <option value="">Select country...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Avatar Image</label>
+                <button type="button" class="btn btn-secondary" id="btn-select-avatar">
+                    <i class="fa-solid fa-image"></i> Select Image File
+                </button>
+                <span id="selected-avatar-name" style="font-size: 11px; color: var(--accent); margin-top: 4px; display: block; word-break: break-all;"></span>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Alternative names / Localized spellings (comma separated)</label>
+                <input type="text" class="form-input" id="artist-aliases" placeholder="e.g. Debussy, クロード・ドビュッシー">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Link Production Project Path (Optional)</label>
+                <div class="path-picker-row">
+                    <input type="text" class="form-input" id="artist-project-path" placeholder="Path to project folder or file...">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-artist-project-folder" title="Browse folder"><i class="fa-solid fa-folder"></i></button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-artist-project-file" title="Browse file"><i class="fa-solid fa-file"></i></button>
+                </div>
+            </div>
+            <div id="artist-linked-projects" class="hidden" style="margin-bottom: 12px;"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-artist')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Artist</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create / Edit Album Modal -->
+<div class="modal-overlay" id="modal-album">
+    <div class="modal-content glass-panel">
+        <div class="modal-header">
+            <h3 class="modal-title" id="album-modal-title">Add New Album</h3>
+            <button class="modal-close" onclick="closeModal('modal-album')">&times;</button>
+        </div>
+        <form id="form-create-album">
+            <input type="hidden" id="album-edit-slug">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Album Title</label>
+                <input type="text" class="form-input" id="album-title" placeholder="e.g. Suite Bergamasque" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Album Artist</label>
+                <select class="select-input form-input" id="album-artist" required>
+                    <option value="">Select artist...</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Release Date</label>
+                <input type="date" class="form-input" id="album-release-date">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Album Cover Art</label>
+                <button type="button" class="btn btn-secondary" id="btn-select-cover">
+                    <i class="fa-solid fa-image"></i> Select Image File
+                </button>
+                <span id="selected-cover-name" style="font-size: 11px; color: var(--accent); margin-top: 4px; display: block; word-break: break-all;"></span>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">Link Production Project Path (Optional)</label>
+                <div class="path-picker-row">
+                    <input type="text" class="form-input" id="album-project-path" placeholder="Path to project folder or file...">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-album-project-folder" title="Browse folder"><i class="fa-solid fa-folder"></i></button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-album-project-file" title="Browse file"><i class="fa-solid fa-file"></i></button>
+                </div>
+            </div>
+            <div id="album-linked-projects" class="hidden" style="margin-bottom: 12px;"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-album')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Album</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Song Modal -->
+<div class="modal-overlay" id="modal-edit-song">
+    <div class="modal-content glass-panel" style="width: 540px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Song Metadata</h3>
+            <button class="modal-close" onclick="closeModal('modal-edit-song')">&times;</button>
+        </div>
+        <form id="form-edit-song" class="import-form">
+            <input type="hidden" id="edit-song-file">
+
+            <div class="linked-projects-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <div>
+                        <span class="form-label" style="display:block;">Audio File</span>
+                        <span id="edit-song-audio-status" style="font-size: 12px; color: var(--text-secondary);"></span>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-attach-audio">
+                        <i class="fa-solid fa-upload"></i> Attach / Replace Audio
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Song Title</label>
+                <input type="text" class="form-input" id="edit-song-title" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Main Artist(s)</label>
+                <input type="text" class="form-input" id="edit-main-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
+                <div class="selected-artists-list" id="edit-badge-main-artists"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Featured Artist(s)</label>
+                <input type="text" class="form-input" id="edit-feat-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
+                <div class="selected-artists-list" id="edit-badge-feat-artists"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Album</label>
+                    <input type="text" class="form-input" id="edit-album" placeholder="None / Single / Type name..." list="albums-datalist">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Track Number</label>
+                    <input type="number" class="form-input" id="edit-track-no" min="1">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Key</label>
+                    <select class="select-input form-input" id="edit-key">
+                        <option value="">Unknown</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Scale</label>
+                    <select class="select-input form-input" id="edit-scale">
+                        <option value="">Unknown</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Tempo (BPM)</label>
+                    <input type="number" class="form-input" id="edit-tempo" min="20" max="300">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Release Date</label>
+                    <input type="date" class="form-input" id="edit-release-date">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Genres</label>
+                <input type="text" class="form-input" id="edit-genres-input" placeholder="Type genre and press Enter..." list="genres-datalist">
+                <div class="selected-artists-list" id="edit-badge-genres"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tags</label>
+                <label class="ai-toggle-row">
+                    <span><i class="fa-solid fa-wand-magic-sparkles"></i> Mark as <strong>AI Generated</strong></span>
+                    <input type="checkbox" id="edit-ai-generated">
+                </label>
+                <input type="text" class="form-input" id="edit-tags-input" placeholder="Type tag and press Enter..." list="tags-datalist">
+                <div class="selected-artists-list" id="edit-badge-tags"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Link Production Project Path (Optional)</label>
+                <div class="path-picker-row">
+                    <input type="text" class="form-input" id="edit-song-project-path" placeholder="Path to DAW project folder or file...">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-song-project-folder" title="Browse folder"><i class="fa-solid fa-folder"></i></button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-song-project-file" title="Browse file"><i class="fa-solid fa-file"></i></button>
+                </div>
+            </div>
+
+            <div id="edit-song-linked-projects" class="hidden"></div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-song')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create / Edit Project Modal -->
+<div class="modal-overlay" id="modal-project">
+    <div class="modal-content glass-panel" style="width: 500px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="project-modal-title">Link Production Project</h3>
+            <button class="modal-close" onclick="closeModal('modal-project')">&times;</button>
+        </div>
+        <form id="form-project" class="import-form">
+            <input type="hidden" id="project-edit-id">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Target Type</label>
+                    <select class="select-input form-input" id="project-entity-type" required>
+                        <option value="song">Song</option>
+                        <option value="artist">Artist</option>
+                        <option value="album">Album</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Item</label>
+                    <select class="select-input form-input" id="project-entity-id" required>
+                        <option value="">Select item...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Project Name (Optional — defaults to folder/file name)</label>
+                <input type="text" class="form-input" id="project-name" placeholder="e.g. Remix FLP v2">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Project Path *</label>
+                <div class="path-picker-row">
+                    <input type="text" class="form-input" id="project-path" placeholder="e.g. D:\Projects\MyTrack\track.flp" required>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-modal-project-folder" title="Browse folder"><i class="fa-solid fa-folder"></i></button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-modal-project-file" title="Browse file"><i class="fa-solid fa-file"></i></button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notes (Optional)</label>
+                <input type="text" class="form-input" id="project-notes" placeholder="e.g. Ableton Live 12, 128 BPM remix stems">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-project')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Project Link</button>
+            </div>
+        </form>
+    </div>
+</div>

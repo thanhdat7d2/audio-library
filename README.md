@@ -117,7 +117,7 @@ pip install -r requirements.txt
   pythonw app.pyw
   ```
 
-On first launch, click **Select Directory** to choose or create your local audio library root. The chosen path is stored locally in `app_settings.txt` (gitignored).
+On first launch, click **Select Directory** to choose or create your local audio library root. The chosen path is stored locally in `app_settings.json` (gitignored).
 
 ---
 
@@ -143,11 +143,6 @@ The SQLite schema (`src/audio_library/database.py`) enforces `PRAGMA foreign_key
 
 ## Roadmap
 
-- Migrate local runtime configuration from plain text to JSON
-- Custom user tagging (e.g., AI-generated, remix, demo)
-- Linking tracks to DAW / music production project paths
-- Metadata-only song entries (registering tracks before audio files exist)
-- Batch import from spreadsheets (CSV / Excel)
 - UI views for Mixtapes, Playlists, Sample Packs, Loop Packs, and Stems
 
 ---

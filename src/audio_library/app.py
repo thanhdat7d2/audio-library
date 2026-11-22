@@ -1,15 +1,31 @@
 import os
+import re
 import socket
 import threading
 from pathlib import Path
 
 import webview
-from bottle import Bottle, static_file
+from bottle import Bottle, response, static_file
 
 from .api import AudioLibraryAPI
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WEB_DIR = PROJECT_ROOT / "web"
+INCLUDE_PATTERN = re.compile(r"<!--\s*include:([a-zA-Z0-9_./-]+)\s*-->")
+
+
+def render_index_html() -> str:
+    """Renders web/index.html by inlining modular HTML partials."""
+    html = (WEB_DIR / "index.html").read_text(encoding="utf-8")
+
+    def _replace(match):
+        rel_path = match.group(1)
+        partial_path = (WEB_DIR / rel_path).resolve()
+        if WEB_DIR.resolve() in partial_path.parents and partial_path.is_file():
+            return partial_path.read_text(encoding="utf-8")
+        return ""
+
+    return INCLUDE_PATTERN.sub(_replace, html)
 
 
 def find_free_port() -> int:
@@ -25,7 +41,8 @@ def create_app(api_bridge: AudioLibraryAPI) -> Bottle:
 
     @app.route("/")
     def index():
-        return static_file("index.html", root=str(WEB_DIR))
+        response.content_type = "text/html; charset=utf-8"
+        return render_index_html()
 
     @app.route("/css/<filename:path>")
     def serve_css(filename):

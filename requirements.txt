@@ -1,3 +1,4 @@
 pywebview>=6.0
 bottle>=0.13
 mutagen>=1.47
+openpyxl>=3.1

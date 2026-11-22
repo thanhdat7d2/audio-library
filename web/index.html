@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Library Manager</title>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Local Stylesheet -->
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-    <!-- Main App Layout -->
     <div class="app-container">
-        
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-container">
                 <i class="fa-solid fa-compact-disc logo-icon"></i>
                 <span class="logo-text">DECK MANAGER</span>
             </div>
-            
+
             <nav style="flex: 1;">
                 <ul class="nav-menu">
                     <li class="nav-item active" data-view="dashboard">
@@ -39,9 +35,13 @@
                         <i class="fa-solid fa-record-vinyl"></i>
                         <span>Albums</span>
                     </li>
+                    <li class="nav-item" data-view="projects">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Projects</span>
+                    </li>
                     <li class="nav-item" data-view="import">
                         <i class="fa-solid fa-file-import"></i>
-                        <span>Import File</span>
+                        <span>Add / Import</span>
                     </li>
                 </ul>
             </nav>
@@ -56,231 +56,8 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
-            
-            <!-- Setup View (Visible when no Library is selected) -->
-            <div id="view-setup" class="setup-container hidden">
-                <i class="fa-solid fa-folder-open setup-icon"></i>
-                <h1 class="setup-title">Open Audio Library</h1>
-                <p class="setup-desc">
-                    Choose a local directory to use as your Audio Library root. This folder will store all your files (songs, loop/sample packs, artist/album art) and hold your SQLite metadata database.
-                </p>
-                <button class="btn btn-primary" id="btn-select-folder">
-                    <i class="fa-solid fa-folder-plus"></i> Select Directory
-                </button>
-            </div>
-
-            <!-- Dashboard View -->
-            <div id="view-dashboard" class="view-panel">
-                <h1 class="view-title">Dashboard</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 24px;">Overview and summary of your audio library.</p>
-                
-                <div class="stats-grid">
-                    <div class="stat-card glass-panel">
-                        <span class="stat-label">Total Songs</span>
-                        <span class="stat-val" id="stat-songs">0</span>
-                    </div>
-                    <div class="stat-card glass-panel">
-                        <span class="stat-label">Artists</span>
-                        <span class="stat-val" id="stat-artists">0</span>
-                    </div>
-                    <div class="stat-card glass-panel">
-                        <span class="stat-label">Albums</span>
-                        <span class="stat-val" id="stat-albums">0</span>
-                    </div>
-                    <div class="stat-card glass-panel">
-                        <span class="stat-label">Genres</span>
-                        <span class="stat-val" id="stat-genres">0</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 40px;">
-                    <h3 style="font-family: var(--font-heading); margin-bottom: 16px;">Quick Actions</h3>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-primary" onclick="switchView('import')">
-                            <i class="fa-solid fa-plus"></i> Import New Track
-                        </button>
-                        <button class="btn btn-secondary" id="btn-quick-artist">
-                            <i class="fa-solid fa-user-plus"></i> New Artist
-                        </button>
-                        <button class="btn btn-secondary" id="btn-quick-album">
-                            <i class="fa-solid fa-compact-disc"></i> New Album
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Songs View -->
-            <div id="view-songs" class="view-panel hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <div>
-                        <h1 class="view-title">Song Library</h1>
-                        <p style="color: var(--text-secondary); font-size: 14px;">All tracks registered in this library folder.</p>
-                    </div>
-                </div>
-
-                <div class="controls-bar">
-                    <input type="text" placeholder="Search song name, artists..." class="search-input" id="search-songs">
-                    
-                    <div class="filter-selects">
-                        <select class="select-input" id="filter-genre">
-                            <option value="">All Genres</option>
-                        </select>
-                        <select class="select-input" id="filter-key">
-                            <option value="">All Keys</option>
-                        </select>
-                        <select class="select-input" id="filter-scale">
-                            <option value="">All Scales</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="songs-table-container glass-panel" style="margin-top: 20px;">
-                    <table class="songs-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;"></th>
-                                <th>Song Name</th>
-                                <th>Artists</th>
-                                <th>Album</th>
-                                <th>Genre</th>
-                                <th>Key/Scale</th>
-                                <th>Tempo (BPM)</th>
-                                <th>Duration</th>
-                                <th style="width: 50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="songs-list-body">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Artists View -->
-            <div id="view-artists" class="view-panel hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h1 class="view-title">Artists</h1>
-                        <p style="color: var(--text-secondary); font-size: 14px;">Manage artist records and details.</p>
-                    </div>
-                    <button class="btn btn-primary" id="btn-add-artist">
-                        <i class="fa-solid fa-user-plus"></i> Add Artist
-                    </button>
-                </div>
-                <div class="media-grid" id="artists-grid">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Albums View -->
-            <div id="view-albums" class="view-panel hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h1 class="view-title">Albums</h1>
-                        <p style="color: var(--text-secondary); font-size: 14px;">Browse albums in your library.</p>
-                    </div>
-                    <button class="btn btn-primary" id="btn-add-album">
-                        <i class="fa-solid fa-compact-disc"></i> Add Album
-                    </button>
-                </div>
-                <div class="media-grid" id="albums-grid">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Import View -->
-            <div id="view-import" class="view-panel hidden">
-                <h1 class="view-title">Import Assets</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 24px;">Add a local audio track to your physical library and register it.</p>
-                
-                <div class="import-layout">
-                    <!-- File Chooser Column -->
-                    <div class="dropzone-container glass-panel" id="import-dropzone">
-                        <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
-                        <h3>Select File</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; max-width: 280px;">
-                            Click to select an audio file (MP3, WAV, FLAC, OGG) from your device.
-                        </p>
-                        <div id="selected-file-details" class="hidden" style="margin-top: 10px; text-align: left; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); width: 100%;">
-                            <span style="font-weight: 600; font-size: 12px;">Selected File:</span>
-                            <p id="selected-file-name" style="font-size: 13px; color: var(--accent); margin-top: 4px; word-break: break-all;"></p>
-                        </div>
-                    </div>
-
-                    <!-- Details Input Column -->
-                    <div class="glass-panel" style="padding: 24px;">
-                        <form class="import-form" id="import-song-form">
-                            <div class="form-group">
-                                <label class="form-label">Song Title</label>
-                                <input type="text" class="form-input" id="import-song-title" placeholder="e.g. Moonlight Sonata">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Main Artist(s)</label>
-                                <input type="text" class="form-input" id="import-main-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
-                                <datalist id="artists-datalist"></datalist>
-                                <div class="selected-artists-list" id="badge-main-artists"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Featured Artist(s)</label>
-                                <input type="text" class="form-input" id="import-feat-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
-                                <div class="selected-artists-list" id="badge-feat-artists"></div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Album</label>
-                                    <input type="text" class="form-input" id="import-album" placeholder="None / Single / Type name..." list="albums-datalist">
-                                    <datalist id="albums-datalist"></datalist>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Track Number</label>
-                                    <input type="number" class="form-input" id="import-track-no" placeholder="Auto" min="1">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Key</label>
-                                    <select class="select-input form-input" id="import-key">
-                                        <option value="">Unknown</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Scale</label>
-                                    <select class="select-input form-input" id="import-scale">
-                                        <option value="">Unknown</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Tempo (BPM)</label>
-                                    <input type="number" class="form-input" id="import-tempo" placeholder="e.g. 120" min="20" max="300">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Release Date</label>
-                                    <input type="date" class="form-input" id="import-release-date">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Genres</label>
-                                <input type="text" class="form-input" id="import-genres-input" placeholder="Type genre and press Enter..." list="genres-datalist">
-                                <datalist id="genres-datalist"></datalist>
-                                <div class="selected-artists-list" id="badge-genres"></div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <i class="fa-solid fa-file-import"></i> Copy & Register Track
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
+            <!-- include:partials/views_catalog.html -->
+            <!-- include:partials/views_import.html -->
         </main>
     </div>
 
@@ -320,174 +97,16 @@
         </div>
     </footer>
 
-    <!-- HTML5 Audio element -->
     <audio id="main-audio-element" style="display: none;"></audio>
 
-    <!-- Create Artist Modal -->
-    <div class="modal-overlay" id="modal-artist">
-        <div class="modal-content glass-panel">
-            <div class="modal-header">
-                <h3 class="modal-title" id="artist-modal-title">Add New Artist</h3>
-                <button class="modal-close" onclick="closeModal('modal-artist')">&times;</button>
-            </div>
-            <form id="form-create-artist">
-                <input type="hidden" id="artist-edit-slug">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Artist Name / Alias</label>
-                    <input type="text" class="form-input" id="artist-name" placeholder="e.g. Claude Debussy" required>
-                </div>
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Real Name</label>
-                    <input type="text" class="form-input" id="artist-real-name" placeholder="e.g. Achille-Claude Debussy">
-                </div>
-                <div class="form-row" style="margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-input" id="artist-dob">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Country</label>
-                        <select class="select-input form-input" id="artist-country">
-                            <option value="">Select country...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label class="form-label">Avatar Image</label>
-                    <button type="button" class="btn btn-secondary" id="btn-select-avatar">
-                        <i class="fa-solid fa-image"></i> Select Image File
-                    </button>
-                    <span id="selected-avatar-name" style="font-size: 11px; color: var(--accent); margin-top: 4px; display: block; word-break: break-all;"></span>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Alternative names / Localized spellings (comma separated)</label>
-                    <input type="text" class="form-input" id="artist-aliases" placeholder="e.g. Debussy, クロード・ドビュッシー">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-artist')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Artist</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- include:partials/modals.html -->
 
-    <!-- Create Album Modal -->
-    <div class="modal-overlay" id="modal-album">
-        <div class="modal-content glass-panel">
-            <div class="modal-header">
-                <h3 class="modal-title" id="album-modal-title">Add New Album</h3>
-                <button class="modal-close" onclick="closeModal('modal-album')">&times;</button>
-            </div>
-            <form id="form-create-album">
-                <input type="hidden" id="album-edit-slug">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Album Title</label>
-                    <input type="text" class="form-input" id="album-title" placeholder="e.g. Suite Bergamasque" required>
-                </div>
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Album Artist</label>
-                    <select class="select-input form-input" id="album-artist" required>
-                        <option value="">Select artist...</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label class="form-label">Release Date</label>
-                    <input type="date" class="form-input" id="album-release-date">
-                </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label class="form-label">Album Cover Art</label>
-                    <button type="button" class="btn btn-secondary" id="btn-select-cover">
-                        <i class="fa-solid fa-image"></i> Select Image File
-                    </button>
-                    <span id="selected-cover-name" style="font-size: 11px; color: var(--accent); margin-top: 4px; display: block; word-break: break-all;"></span>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-album')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Album</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Song Modal -->
-    <div class="modal-overlay" id="modal-edit-song">
-        <div class="modal-content glass-panel" style="width: 500px;">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Song Metadata</h3>
-                <button class="modal-close" onclick="closeModal('modal-edit-song')">&times;</button>
-            </div>
-            <form id="form-edit-song" class="import-form">
-                <input type="hidden" id="edit-song-file">
-                
-                <div class="form-group">
-                    <label class="form-label">Song Title</label>
-                    <input type="text" class="form-input" id="edit-song-title" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Main Artist(s)</label>
-                    <input type="text" class="form-input" id="edit-main-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
-                    <div class="selected-artists-list" id="edit-badge-main-artists"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Featured Artist(s)</label>
-                    <input type="text" class="form-input" id="edit-feat-artists-input" placeholder="Type artist name and press Enter..." list="artists-datalist">
-                    <div class="selected-artists-list" id="edit-badge-feat-artists"></div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Album</label>
-                        <input type="text" class="form-input" id="edit-album" placeholder="None / Single / Type name..." list="albums-datalist">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Track Number</label>
-                        <input type="number" class="form-input" id="edit-track-no" min="1">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Key</label>
-                        <select class="select-input form-input" id="edit-key">
-                            <option value="">Unknown</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Scale</label>
-                        <select class="select-input form-input" id="edit-scale">
-                            <option value="">Unknown</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Tempo (BPM)</label>
-                        <input type="number" class="form-input" id="edit-tempo" min="20" max="300">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Release Date</label>
-                        <input type="date" class="form-input" id="edit-release-date">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Genres</label>
-                    <input type="text" class="form-input" id="edit-genres-input" placeholder="Type genre and press Enter..." list="genres-datalist">
-                    <div class="selected-artists-list" id="edit-badge-genres"></div>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-song')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Local App JavaScript logic -->
+    <!-- Modular App JavaScript -->
+    <script src="/js/state.js"></script>
+    <script src="/js/player.js"></script>
+    <script src="/js/views.js"></script>
+    <script src="/js/modals.js"></script>
+    <script src="/js/spreadsheet.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

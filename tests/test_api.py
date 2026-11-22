@@ -1,43 +1,17 @@
-import os
-import sys
-import tempfile
+import json
 import unittest
-import wave
-from pathlib import Path
 
-SRC_DIR = Path(__file__).resolve().parents[1] / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
-
+from tests.helpers import BaseLibraryTestCase, create_silent_wav
 from audio_library.api import AudioLibraryAPI, LIBRARY_SUBFOLDERS
+from audio_library.app import render_index_html
 
 
-def create_silent_wav(path: Path, duration_sec: float = 1.0, sample_rate: int = 8000) -> None:
-    """Creates a minimal valid PCM WAV file for testing audio import & duration extraction."""
-    num_frames = int(duration_sec * sample_rate)
-    with wave.open(str(path), "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(sample_rate)
-        wf.writeframes(b"\x00\x00" * num_frames)
-
-
-class TestAudioLibraryAPI(unittest.TestCase):
-    def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.root = Path(self.temp_dir.name)
-        self.library_dir = self.root / "library"
-        self.config_file = self.root / "app_settings.txt"
-        self.api = AudioLibraryAPI(config_file=self.config_file)
-
-    def tearDown(self):
-        self.temp_dir.cleanup()
-
+class TestAudioLibraryAPI(BaseLibraryTestCase):
     def test_unconfigured_status_before_init(self):
         self.assertEqual(self.api.get_library_status()["status"], "unconfigured")
         self.assertEqual(self.api.get_songs(), [])
 
-    def test_initialize_library_creates_folders_and_persists_settings(self):
+    def test_initialize_library_creates_folders_and_persists_json_settings(self):
         res = self.api.initialize_library(str(self.library_dir))
         self.assertEqual(res["status"], "success")
         self.assertEqual(self.api.get_library_status()["status"], "configured")
@@ -45,12 +19,17 @@ class TestAudioLibraryAPI(unittest.TestCase):
         for folder in LIBRARY_SUBFOLDERS:
             self.assertTrue((self.library_dir / folder).is_dir())
         self.assertTrue((self.library_dir / "data" / "library.db").is_file())
-        self.assertEqual(self.config_file.read_text(encoding="utf-8").strip(), str(self.library_dir))
 
-    def test_artist_album_and_song_lifecycle(self):
+        saved_json = json.loads(self.config_file.read_text(encoding="utf-8"))
+        self.assertEqual(saved_json["library_path"], str(self.library_dir))
+
+        reloaded = AudioLibraryAPI(config_file=self.config_file)
+        self.assertEqual(reloaded.get_library_status()["status"], "configured")
+        self.assertEqual(reloaded.library_path, str(self.library_dir))
+
+    def test_artist_album_and_song_lifecycle_with_tags(self):
         self.api.initialize_library(str(self.library_dir))
 
-        # Create artist with avatar
         avatar_src = self.root / "avatar.png"
         avatar_src.write_bytes(b"fake-png")
         artist_res = self.api.create_artist(
@@ -65,7 +44,6 @@ class TestAudioLibraryAPI(unittest.TestCase):
         self.assertEqual(artist_res["status"], "success")
         artist_slug = artist_res["slug"]
 
-        # Create album with cover
         cover_src = self.root / "cover.jpg"
         cover_src.write_bytes(b"fake-jpg")
         album_res = self.api.create_album(
@@ -78,14 +56,13 @@ class TestAudioLibraryAPI(unittest.TestCase):
         )
         self.assertEqual(album_res["status"], "success")
 
-        # Verify metadata options return full artist/album details
         options = self.api.get_metadata_options()
         self.assertEqual(len(options["artists"]), 1)
         self.assertEqual(options["artists"][0]["avatar_image"], f"artist/{artist_slug}/avatar.png")
         self.assertEqual(len(options["albums"]), 1)
         self.assertTrue(options["albums"][0]["album_cover"].endswith("cover.jpg"))
+        self.assertIn("AI Generated", [t["tag_name"] for t in options["tags"]])
 
-        # Import two tracks with identical names to verify collision handling & duration reading
         wav_src = self.root / "clair_de_lune.wav"
         create_silent_wav(wav_src, duration_sec=2.0)
 
@@ -100,34 +77,42 @@ class TestAudioLibraryAPI(unittest.TestCase):
                 "scale": "Minor",
                 "tempo": 66,
                 "genres": ["Classical", "Impressionist"],
+                "tags": ["AI Generated", "Piano Solo"],
             },
         )
         self.assertEqual(import_1["status"], "success")
         self.assertEqual(import_1["song_file"], "Clair_de_Lune.wav")
+        self.assertTrue(import_1["has_audio"])
 
         import_2 = self.api.import_song(
             str(wav_src),
             {
                 "song_name": "Clair de Lune",
                 "main_artists": ["Claude Debussy"],
+                "ai_generated": True,
             },
         )
         self.assertEqual(import_2["status"], "success")
         self.assertEqual(import_2["song_file"], "Clair_de_Lune_1.wav")
 
-        # Query songs & verify SQL joins and duration
         songs = self.api.get_songs()
         self.assertEqual(len(songs), 2)
         first = next(s for s in songs if s["song_file"] == "Clair_de_Lune.wav")
         self.assertAlmostEqual(first["duration"], 2.0, places=1)
+        self.assertEqual(first["has_audio"], 1)
+        self.assertEqual(first["audio_file"], "Clair_de_Lune.wav")
         self.assertEqual(first["key_name"], "D#")
         self.assertEqual(first["scale_name"], "Minor")
         self.assertEqual(first["main_artists_slugs"], artist_slug)
         self.assertEqual(first["feat_artists"], "Guest Soloist")
         self.assertIn("Classical", first["genres"])
         self.assertIn("Impressionist", first["genres"])
+        self.assertIn("AI Generated", first["tags"])
+        self.assertIn("Piano Solo", first["tags"])
 
-        # Update song metadata
+        second = next(s for s in songs if s["song_file"] == "Clair_de_Lune_1.wav")
+        self.assertIn("AI Generated", second["tags"])
+
         upd = self.api.update_song(
             "Clair_de_Lune.wav",
             {
@@ -140,6 +125,7 @@ class TestAudioLibraryAPI(unittest.TestCase):
                 "scale": "Major",
                 "tempo": 68,
                 "genres": ["Classical"],
+                "tags": ["Mastered"],
             },
         )
         self.assertEqual(upd["status"], "success")
@@ -148,12 +134,19 @@ class TestAudioLibraryAPI(unittest.TestCase):
         self.assertEqual(updated_first["song_name"], "Clair de Lune (Remastered)")
         self.assertEqual(updated_first["track_number"], 3)
         self.assertEqual(updated_first["tempo"], 68)
+        self.assertEqual(updated_first["tags"], "Mastered")
 
-        # Stats check
         stats = self.api.get_stats()
         self.assertEqual(stats["songs"], 2)
-        self.assertEqual(stats["artists"], 2)  # Debussy + auto-created Guest Soloist
+        self.assertEqual(stats["artists"], 2)
         self.assertEqual(stats["albums"], 1)
+
+    def test_render_index_html_inlines_partials(self):
+        html = render_index_html()
+        self.assertIn('id="view-dashboard"', html)
+        self.assertIn('id="view-import"', html)
+        self.assertIn('id="modal-project"', html)
+        self.assertNotIn("<!-- include:", html)
 
 
 if __name__ == "__main__":
