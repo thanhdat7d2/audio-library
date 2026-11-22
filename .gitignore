@@ -1,0 +1,40 @@
+# Personal notes, transcripts, and local config backups
+doc/
+
+# Runtime local configuration & user library data
+app_settings.txt
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build & packaging artifacts
+build/
+dist/
+*.egg-info/
+*.spec
+
+# Editor & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
