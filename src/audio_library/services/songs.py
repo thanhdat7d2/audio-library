@@ -110,8 +110,8 @@ def _sync_song_relations(conn, library_path: str, song_file: str, song_data: dic
         ensure_project_link(conn, "song", song_file, song_data.get("project_path"), song_data.get("project_name"))
 
 
-def import_song(db_path: str, library_path: str, file_path, song_data: dict) -> dict:
-    """Registers a song (copying audio into 'song/' when file_path is provided, or metadata-only if omitted)."""
+def import_song(db_path: str, library_path: str, file_path, song_data: dict, move_file: bool = False) -> dict:
+    """Registers a song (copying or moving audio into 'song/' when file_path is provided, or metadata-only if omitted)."""
     song_data = song_data or {}
     has_file = bool(file_path and str(file_path).strip())
     if has_file and not os.path.exists(file_path):
@@ -119,6 +119,7 @@ def import_song(db_path: str, library_path: str, file_path, song_data: dict) -> 
 
     conn = database.get_db_connection(db_path)
     dest_path = None
+    moved = False
     try:
         song_name = str(song_data.get("song_name") or "").strip()
         if not song_name:
@@ -134,7 +135,11 @@ def import_song(db_path: str, library_path: str, file_path, song_data: dict) -> 
             ext = os.path.splitext(file_path)[1].lower()
             unique_filename = generate_unique_song_key(conn, library_path, song_name, extension=ext)
             dest_path = os.path.join(song_dir, unique_filename)
-            shutil.copy2(file_path, dest_path)
+            if move_file:
+                shutil.move(file_path, dest_path)
+                moved = True
+            else:
+                shutil.copy2(file_path, dest_path)
             duration = get_audio_duration(dest_path)
             has_audio = 1
             audio_file = unique_filename
@@ -176,7 +181,10 @@ def import_song(db_path: str, library_path: str, file_path, song_data: dict) -> 
         }
     except Exception as e:
         if dest_path and os.path.exists(dest_path):
-            os.remove(dest_path)
+            if moved:
+                shutil.move(dest_path, file_path)
+            else:
+                os.remove(dest_path)
         return {"status": "error", "message": str(e)}
     finally:
         conn.close()

@@ -145,8 +145,21 @@ class TestAudioLibraryAPI(BaseLibraryTestCase):
         html = render_index_html()
         self.assertIn('id="view-dashboard"', html)
         self.assertIn('id="view-import"', html)
+        self.assertIn('id="view-settings"', html)
         self.assertIn('id="modal-project"', html)
+        self.assertIn('id="player-waveform-canvas"', html)
+        self.assertNotIn("DECK MANAGER", html)
         self.assertNotIn("<!-- include:", html)
+
+    def test_update_settings_persists_theme_and_library_path(self):
+        res = self.api.update_settings({"theme": "midnight-violet", "library_path": str(self.library_dir)})
+        self.assertEqual(res["status"], "success")
+        self.assertEqual(res["settings"]["theme"], "midnight-violet")
+        self.assertEqual(res["settings"]["library_path"], str(self.library_dir))
+
+        reloaded = AudioLibraryAPI(config_file=self.config_file)
+        self.assertEqual(reloaded.get_settings()["theme"], "midnight-violet")
+        self.assertEqual(reloaded.library_path, str(self.library_dir))
 
 
 if __name__ == "__main__":

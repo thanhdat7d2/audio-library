@@ -19,10 +19,12 @@ function playSongAtIndex(index, playlist = songsList) {
     currentIndex = index;
     const song = currentPlaylist[currentIndex];
     const audioFilename = song.audio_file || song.song_file;
+    const audioUrl = `/media/song/${encodeURIComponent(audioFilename)}`;
 
-    audio.src = `/media/song/${encodeURIComponent(audioFilename)}`;
+    audio.src = audioUrl;
     audio.play();
     isPlaying = true;
+    loadWaveformForUrl(audioUrl, song.song_file);
 
     document.getElementById('current-title').innerText = song.song_name;
     document.getElementById('current-artist').innerText = song.main_artists || 'Unknown Artist';
@@ -70,6 +72,8 @@ function updatePlayerButtonState() {
 }
 
 function setupPlayerListeners() {
+    setupWaveformInteractions();
+
     document.getElementById('btn-play-pause').addEventListener('click', togglePlayPause);
 
     document.getElementById('btn-prev').addEventListener('click', () => {
@@ -95,24 +99,20 @@ function setupPlayerListeners() {
         const dur = audio.duration || 0;
         document.getElementById('player-current-time').innerText = formatTime(cur);
         document.getElementById('player-total-time').innerText = formatTime(dur);
-        const pct = dur > 0 ? (cur / dur) * 100 : 0;
-        document.getElementById('player-progress-fill').style.width = `${pct}%`;
-    });
-
-    const progressBar = document.getElementById('player-progress-bar');
-    progressBar.addEventListener('click', (e) => {
-        const rect = progressBar.getBoundingClientRect();
-        const pct = (e.clientX - rect.left) / rect.width;
-        if (audio.duration) audio.currentTime = pct * audio.duration;
+        drawWaveform(dur > 0 ? cur / dur : 0);
     });
 
     const volumeBar = document.getElementById('player-volume-bar');
-    volumeBar.addEventListener('click', (e) => {
+    const setVolumeFromEvent = (e) => {
         const rect = volumeBar.getBoundingClientRect();
         const pct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
         audio.volume = pct;
         document.getElementById('player-volume-fill').style.width = `${pct * 100}%`;
-    });
+    };
+    let volDragging = false;
+    volumeBar.addEventListener('mousedown', (e) => { volDragging = true; setVolumeFromEvent(e); });
+    window.addEventListener('mousemove', (e) => { if (volDragging) setVolumeFromEvent(e); });
+    window.addEventListener('mouseup', () => { volDragging = false; });
 
     audio.addEventListener('ended', () => {
         let nextIdx = -1;
@@ -127,6 +127,7 @@ function setupPlayerListeners() {
         } else {
             isPlaying = false;
             updatePlayerButtonState();
+            drawWaveform(0);
             renderSongsTable(getFilteredSongs());
         }
     });

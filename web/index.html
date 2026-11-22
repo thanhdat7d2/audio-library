@@ -12,11 +12,6 @@
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="logo-container">
-                <i class="fa-solid fa-compact-disc logo-icon"></i>
-                <span class="logo-text">DECK MANAGER</span>
-            </div>
-
             <nav style="flex: 1;">
                 <ul class="nav-menu">
                     <li class="nav-item active" data-view="dashboard">
@@ -47,9 +42,9 @@
             </nav>
 
             <div class="nav-menu">
-                <div class="nav-item" id="btn-change-library">
-                    <i class="fa-solid fa-folder-open"></i>
-                    <span>Switch Library</span>
+                <div class="nav-item" data-view="settings" id="nav-settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
                 </div>
             </div>
         </aside>
@@ -58,6 +53,7 @@
         <main class="main-content">
             <!-- include:partials/views_catalog.html -->
             <!-- include:partials/views_import.html -->
+            <!-- include:partials/views_settings.html -->
         </main>
     </div>
 
@@ -65,7 +61,7 @@
     <footer class="player-bar">
         <div class="player-track-info">
             <img src="" class="player-cover hidden" id="current-cover">
-            <div style="width: 48px; height: 48px; border-radius: 6px; background-color: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center;" id="player-placeholder-cover">
+            <div style="width: 48px; height: 48px; border-radius: 6px; background-color: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="player-placeholder-cover">
                 <i class="fa-solid fa-music" style="color: var(--text-muted);"></i>
             </div>
             <div class="player-metadata">
@@ -76,21 +72,21 @@
 
         <div class="player-controls">
             <div class="player-buttons">
-                <button class="player-btn" id="btn-prev"><i class="fa-solid fa-backward-step"></i></button>
-                <button class="player-btn player-btn-main" id="btn-play-pause"><i class="fa-solid fa-circle-play"></i></button>
-                <button class="player-btn" id="btn-next"><i class="fa-solid fa-forward-step"></i></button>
+                <button class="player-btn" id="btn-prev" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+                <button class="player-btn player-btn-main" id="btn-play-pause" title="Play / Pause"><i class="fa-solid fa-circle-play"></i></button>
+                <button class="player-btn" id="btn-next" title="Next"><i class="fa-solid fa-forward-step"></i></button>
             </div>
             <div class="player-slider-container">
                 <span class="player-time" id="player-current-time">0:00</span>
-                <div class="player-progress" id="player-progress-bar">
-                    <div class="player-progress-fill" id="player-progress-fill"></div>
+                <div class="waveform-scrubber" id="player-progress-bar">
+                    <canvas id="player-waveform-canvas"></canvas>
                 </div>
                 <span class="player-time" id="player-total-time">0:00</span>
             </div>
         </div>
 
         <div class="player-volume-container">
-            <i class="fa-solid fa-volume-high" style="color: var(--text-secondary); font-size: 14px;"></i>
+            <i class="fa-solid fa-volume-high player-volume-icon"></i>
             <div class="player-volume-bar" id="player-volume-bar">
                 <div class="player-volume-fill" id="player-volume-fill"></div>
             </div>
@@ -103,10 +99,12 @@
 
     <!-- Modular App JavaScript -->
     <script src="/js/state.js"></script>
+    <script src="/js/waveform.js"></script>
     <script src="/js/player.js"></script>
     <script src="/js/views.js"></script>
     <script src="/js/modals.js"></script>
     <script src="/js/spreadsheet.js"></script>
+    <script src="/js/settings.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

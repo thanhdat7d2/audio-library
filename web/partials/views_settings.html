@@ -1,0 +1,73 @@
+<!-- Settings View -->
+<div id="view-settings" class="view-panel hidden">
+    <h1 class="view-title">Settings</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 24px;">Application preferences saved to <code>app_settings.json</code>.</p>
+
+    <div class="settings-stack">
+        <!-- Library Path -->
+        <div class="glass-panel settings-card">
+            <h3 class="settings-card-title"><i class="fa-solid fa-folder-open" style="color: var(--accent); margin-right: 8px;"></i>Library Path</h3>
+            <p class="settings-card-desc">
+                Root folder where your SQLite database (<code>data/library.db</code>), songs, artist avatars, and album artwork are stored.
+            </p>
+            <div class="path-picker-row">
+                <input type="text" class="form-input" id="settings-library-path" placeholder="No library selected">
+                <button type="button" class="btn btn-secondary" id="btn-settings-browse-library">
+                    <i class="fa-solid fa-folder"></i> Browse
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-settings-apply-library">
+                    Save Path
+                </button>
+            </div>
+            <span id="settings-library-status" style="font-size: 12px; color: var(--accent);"></span>
+        </div>
+
+        <!-- Theme Picker -->
+        <div class="glass-panel settings-card">
+            <h3 class="settings-card-title"><i class="fa-solid fa-palette" style="color: var(--accent); margin-right: 8px;"></i>Theme</h3>
+            <p class="settings-card-desc">Choose the visual theme for the interface. Changes apply immediately and persist across restarts.</p>
+            <div class="theme-grid" id="settings-theme-grid">
+                <button type="button" class="theme-card" data-theme-id="emerald-dark">
+                    <div class="theme-swatch">
+                        <span style="background:#0b0f19;"></span>
+                        <span style="background:#121826;"></span>
+                        <span style="background:#10b981;"></span>
+                    </div>
+                    <span class="theme-name">Emerald Dark</span>
+                </button>
+                <button type="button" class="theme-card" data-theme-id="midnight-violet">
+                    <div class="theme-swatch">
+                        <span style="background:#0d0a1a;"></span>
+                        <span style="background:#161129;"></span>
+                        <span style="background:#8b5cf6;"></span>
+                    </div>
+                    <span class="theme-name">Midnight Violet</span>
+                </button>
+                <button type="button" class="theme-card" data-theme-id="ocean-cyan">
+                    <div class="theme-swatch">
+                        <span style="background:#07131d;"></span>
+                        <span style="background:#0d1e2d;"></span>
+                        <span style="background:#06b6d4;"></span>
+                    </div>
+                    <span class="theme-name">Ocean Cyan</span>
+                </button>
+                <button type="button" class="theme-card" data-theme-id="amber-studio">
+                    <div class="theme-swatch">
+                        <span style="background:#14110f;"></span>
+                        <span style="background:#1d1815;"></span>
+                        <span style="background:#f59e0b;"></span>
+                    </div>
+                    <span class="theme-name">Amber Studio</span>
+                </button>
+                <button type="button" class="theme-card" data-theme-id="light-studio">
+                    <div class="theme-swatch">
+                        <span style="background:#f1f5f9;"></span>
+                        <span style="background:#ffffff;"></span>
+                        <span style="background:#059669;"></span>
+                    </div>
+                    <span class="theme-name">Light Studio</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,7 +9,9 @@ window.addEventListener('DOMContentLoaded', () => {
 async function initApp() {
     setupEventListeners();
     setupSpreadsheetListeners();
+    setupSettingsListeners();
     setupPlayerListeners();
+    await loadAppSettings();
     await checkLibraryStatus();
 }
 
@@ -19,10 +21,8 @@ async function checkLibraryStatus() {
         libraryPath = res.library_path;
         document.getElementById('view-setup').classList.add('hidden');
         document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.id !== 'btn-change-library') {
-                item.style.pointerEvents = 'all';
-                item.style.opacity = '1';
-            }
+            item.style.pointerEvents = 'all';
+            item.style.opacity = '1';
         });
         await refreshLibraryData();
         switchView('dashboard');
@@ -31,7 +31,8 @@ async function checkLibraryStatus() {
         document.getElementById('view-setup').classList.remove('hidden');
         document.querySelectorAll('.view-panel').forEach(v => v.classList.add('hidden'));
         document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.id !== 'btn-change-library' && item.getAttribute('data-view') !== 'dashboard') {
+            const view = item.getAttribute('data-view');
+            if (view !== 'settings' && view !== 'dashboard') {
                 item.style.pointerEvents = 'none';
                 item.style.opacity = '0.5';
             }
@@ -66,12 +67,13 @@ async function refreshLibraryData() {
 }
 
 function switchView(viewName) {
-    if (!libraryPath && viewName !== 'setup') return;
+    if (!libraryPath && viewName !== 'setup' && viewName !== 'settings') return;
 
     document.querySelectorAll('.sidebar .nav-item').forEach(item => item.classList.remove('active'));
     const activeItem = document.querySelector(`.sidebar .nav-item[data-view="${viewName}"]`);
     if (activeItem) activeItem.classList.add('active');
 
+    document.getElementById('view-setup').classList.add('hidden');
     document.querySelectorAll('.view-panel').forEach(v => v.classList.add('hidden'));
     const targetPanel = document.getElementById(`view-${viewName}`);
     if (targetPanel) targetPanel.classList.remove('hidden');
@@ -80,6 +82,7 @@ function switchView(viewName) {
     else if (viewName === 'artists') renderArtistsView();
     else if (viewName === 'albums') renderAlbumsView();
     else if (viewName === 'projects') renderProjectsTable(getFilteredProjects());
+    else if (viewName === 'settings') renderSettingsView();
 }
 
 function updateImportSubmitButton() {
@@ -102,11 +105,6 @@ function setupEventListeners() {
         const res = await window.pywebview.api.select_library_folder();
         if (res.status === 'success') await checkLibraryStatus();
         else if (res.status === 'error') alert('Error setting library: ' + res.message);
-    });
-
-    document.getElementById('btn-change-library').addEventListener('click', async () => {
-        const res = await window.pywebview.api.select_library_folder();
-        if (res.status === 'success') await checkLibraryStatus();
     });
 
     document.getElementById('import-dropzone').addEventListener('click', async (e) => {

@@ -1,13 +1,96 @@
 """Entity resolution and audio metadata helpers."""
 
 import os
+import re
 
+import mutagen
 from mutagen.flac import FLAC
 from mutagen.mp3 import MP3
 from mutagen.oggvorbis import OggVorbis
 from mutagen.wave import WAVE
 
 from ..slug_engine import generate_unique_slug, slugify
+
+
+def extract_audio_metadata(file_path: str) -> dict:
+    """Reads embedded audio tags (title, artist, album, genre, date, bpm, track, key) via mutagen."""
+    meta = {
+        "song_name": "",
+        "main_artists": [],
+        "album_slug": None,
+        "genres": [],
+        "release_date": None,
+        "tempo": None,
+        "track_number": None,
+        "key": None,
+        "scale": None,
+    }
+    try:
+        audio = mutagen.File(file_path, easy=True)
+        if not audio:
+            return meta
+
+        def first_val(keys):
+            for k in keys:
+                vals = audio.get(k)
+                if vals:
+                    text = str(vals[0]).strip()
+                    if text:
+                        return text
+            return ""
+
+        meta["song_name"] = first_val(("title",))
+        artist_raw = first_val(("artist", "albumartist"))
+        if artist_raw:
+            parts = [p.strip() for p in re.split(r"[;]|(?:\s+(?:feat\.?|ft\.?|&|x)\s+)", artist_raw, flags=re.I) if p.strip()]
+            meta["main_artists"] = parts[:5]
+
+        meta["album_slug"] = first_val(("album",)) or None
+        genre_raw = first_val(("genre",))
+        if genre_raw:
+            meta["genres"] = [g.strip() for g in re.split(r"[;,/]", genre_raw) if g.strip()][:5]
+
+        date_raw = first_val(("date", "originaldate", "year"))
+        if date_raw:
+            meta["release_date"] = date_raw[:10]
+
+        bpm_raw = first_val(("bpm", "tempo"))
+        if bpm_raw:
+            m = re.search(r"\d+(?:\.\d+)?", bpm_raw)
+            if m:
+                bpm_val = int(round(float(m.group(0))))
+                if 20 <= bpm_val <= 300:
+                    meta["tempo"] = bpm_val
+
+        track_raw = first_val(("tracknumber",))
+        if track_raw:
+            m = re.match(r"(\d+)", track_raw)
+            if m:
+                meta["track_number"] = int(m.group(1))
+
+        # Optional initial key (e.g. "Am", "C#m", "D Major", "F#")
+        raw_audio = mutagen.File(file_path, easy=False)
+        key_raw = ""
+        if raw_audio and hasattr(raw_audio, "tags") and raw_audio.tags:
+            for tag_key in ("TKEY", "initialkey", "INITIALKEY", "key"):
+                if tag_key in raw_audio.tags:
+                    val = raw_audio.tags[tag_key]
+                    key_raw = str(val[0] if isinstance(val, list) else val).strip()
+                    break
+        if key_raw:
+            km = re.match(r"^([A-Ga-g][#b]?)\s*(m|min|minor|maj|major)?$", key_raw, flags=re.I)
+            if km:
+                note = km.group(1).upper()
+                flat_map = {"DB": "C#", "EB": "D#", "GB": "F#", "AB": "G#", "BB": "A#"}
+                meta["key"] = flat_map.get(note, note)
+                qual = (km.group(2) or "").lower()
+                if qual in ("m", "min", "minor"):
+                    meta["scale"] = "Minor"
+                elif qual in ("maj", "major"):
+                    meta["scale"] = "Major"
+    except Exception:
+        pass
+    return meta
 
 
 def get_audio_duration(file_path: str) -> float:

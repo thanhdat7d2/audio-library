@@ -36,6 +36,18 @@ class AudioLibraryAPI:
     def get_settings(self):
         return self._settings.as_dict()
 
+    def update_settings(self, updates):
+        if not isinstance(updates, dict):
+            return {"status": "error", "message": "Settings payload must be an object"}
+        if "library_path" in updates and updates["library_path"]:
+            init_res = self.initialize_library(updates["library_path"])
+            if init_res.get("status") != "success":
+                return init_res
+        remaining = {k: v for k, v in updates.items() if k != "library_path"}
+        if remaining:
+            self._settings.update(remaining)
+        return {"status": "success", "settings": self._settings.as_dict()}
+
     def initialize_library(self, path):
         try:
             for folder in LIBRARY_SUBFOLDERS:
@@ -118,8 +130,10 @@ class AudioLibraryAPI:
     def add_song(self, song_data, file_path=None):
         return self.import_song(file_path, song_data)
 
-    def import_song(self, file_path, song_data):
-        return self._require_library() or songs.import_song(self.db_path, self.library_path, file_path, song_data)
+    def import_song(self, file_path, song_data, move_file=False):
+        return self._require_library() or songs.import_song(
+            self.db_path, self.library_path, file_path, song_data, move_file=move_file
+        )
 
     def attach_song_audio(self, song_file, file_path):
         return self._require_library() or songs.attach_song_audio(self.db_path, self.library_path, song_file, file_path)

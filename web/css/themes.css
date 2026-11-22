@@ -1,0 +1,151 @@
+/* Theme definitions & Settings Theme Picker */
+
+:root,
+[data-theme="emerald-dark"] {
+    --bg-primary: #0b0f19;
+    --bg-secondary: #121826;
+    --bg-panel: rgba(30, 41, 59, 0.42);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --accent: #10b981;
+    --accent-hover: #34d399;
+    --accent-glow: rgba(16, 185, 129, 0.22);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --waveform-muted: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme="midnight-violet"] {
+    --bg-primary: #0d0a1a;
+    --bg-secondary: #161129;
+    --bg-panel: rgba(38, 28, 66, 0.46);
+    --border-color: rgba(255, 255, 255, 0.09);
+    --accent: #8b5cf6;
+    --accent-hover: #a78bfa;
+    --accent-glow: rgba(139, 92, 246, 0.25);
+    --text-primary: #f5f3ff;
+    --text-secondary: #a5b4fc;
+    --text-muted: #6d6a8a;
+    --waveform-muted: rgba(165, 180, 252, 0.28);
+}
+
+[data-theme="ocean-cyan"] {
+    --bg-primary: #07131d;
+    --bg-secondary: #0d1e2d;
+    --bg-panel: rgba(19, 43, 64, 0.48);
+    --border-color: rgba(186, 230, 253, 0.1);
+    --accent: #06b6d4;
+    --accent-hover: #22d3ee;
+    --accent-glow: rgba(6, 182, 212, 0.25);
+    --text-primary: #f0f9ff;
+    --text-secondary: #93c5fd;
+    --text-muted: #64748b;
+    --waveform-muted: rgba(147, 197, 253, 0.28);
+}
+
+[data-theme="amber-studio"] {
+    --bg-primary: #14110f;
+    --bg-secondary: #1d1815;
+    --bg-panel: rgba(46, 38, 32, 0.48);
+    --border-color: rgba(255, 237, 213, 0.09);
+    --accent: #f59e0b;
+    --accent-hover: #fbbf24;
+    --accent-glow: rgba(245, 158, 11, 0.24);
+    --text-primary: #fefce8;
+    --text-secondary: #c7b8a3;
+    --text-muted: #8a7b68;
+    --waveform-muted: rgba(199, 184, 163, 0.28);
+}
+
+[data-theme="light-studio"] {
+    --bg-primary: #f1f5f9;
+    --bg-secondary: #ffffff;
+    --bg-panel: rgba(255, 255, 255, 0.88);
+    --border-color: rgba(15, 23, 42, 0.1);
+    --accent: #059669;
+    --accent-hover: #10b981;
+    --accent-glow: rgba(5, 150, 105, 0.18);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --waveform-muted: rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light-studio"] .select-input option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+
+/* Settings Layout */
+.settings-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 780px;
+}
+
+.settings-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.settings-card-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.settings-card-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.theme-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-primary);
+    transition: all var(--transition-speed);
+}
+
+.theme-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.theme-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.theme-swatch {
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.theme-swatch span {
+    flex: 1;
+}
+
+.theme-name {
+    font-size: 13px;
+    font-weight: 600;
+}

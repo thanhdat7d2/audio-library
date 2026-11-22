@@ -67,33 +67,13 @@ body {
 }
 
 .sidebar {
-    width: 240px;
+    width: 220px;
     background-color: var(--bg-secondary);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
-    gap: 24px;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 8px;
-}
-
-.logo-icon {
-    font-size: 24px;
-    color: var(--accent);
-    filter: drop-shadow(0 0 8px var(--accent-glow));
-}
-
-.logo-text {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 0.5px;
+    padding: 20px 14px;
+    gap: 16px;
 }
 
 .nav-menu {

@@ -65,5 +65,15 @@ class SettingsManager:
         except Exception:
             pass
 
+    def update(self, updates: dict) -> dict:
+        """Merges key-value updates into settings and persists to JSON."""
+        if isinstance(updates, dict):
+            for k, v in updates.items():
+                self.settings[k] = v
+            self.save()
+        return self.as_dict()
+
     def as_dict(self) -> dict:
-        return dict(self.settings)
+        data = dict(self.settings)
+        data.setdefault("theme", "emerald-dark")
+        return data
