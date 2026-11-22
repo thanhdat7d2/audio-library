@@ -60,6 +60,7 @@ async function refreshLibraryData() {
     songsList = await window.pywebview.api.get_songs();
     projectsList = await window.pywebview.api.get_projects();
 
+    renderDashboardRecent();
     renderSongsTable(getFilteredSongs());
     renderArtistsView();
     renderAlbumsView();
@@ -78,7 +79,8 @@ function switchView(viewName) {
     const targetPanel = document.getElementById(`view-${viewName}`);
     if (targetPanel) targetPanel.classList.remove('hidden');
 
-    if (viewName === 'songs') renderSongsTable(getFilteredSongs());
+    if (viewName === 'dashboard') renderDashboardRecent();
+    else if (viewName === 'songs') renderSongsTable(getFilteredSongs());
     else if (viewName === 'artists') renderArtistsView();
     else if (viewName === 'albums') renderAlbumsView();
     else if (viewName === 'projects') renderProjectsTable(getFilteredProjects());

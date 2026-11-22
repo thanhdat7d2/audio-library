@@ -3,7 +3,7 @@
     <i class="fa-solid fa-folder-open setup-icon"></i>
     <h1 class="setup-title">Open Audio Library</h1>
     <p class="setup-desc">
-        Choose a local directory to use as your Audio Library root. This folder will store all your files (songs, loop/sample packs, artist/album art) and hold your SQLite metadata database.
+        Choose a local directory to use as your Audio Library root. This folder will store your audio files, artwork, and SQLite metadata database.
     </p>
     <button class="btn btn-primary" id="btn-select-folder">
         <i class="fa-solid fa-folder-plus"></i> Select Directory
@@ -12,44 +12,17 @@
 
 <!-- Dashboard View -->
 <div id="view-dashboard" class="view-panel">
-    <h1 class="view-title">Dashboard</h1>
-    <p style="color: var(--text-secondary); margin-bottom: 24px;">Overview and summary of your audio library.</p>
-
-    <div class="stats-grid">
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Total Songs</span>
-            <span class="stat-val" id="stat-songs">0</span>
+    <div class="view-header">
+        <div>
+            <h1 class="view-title">Library Overview</h1>
+            <p class="view-subtitle">Your local catalog, production links, and audio collection.</p>
         </div>
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Artists</span>
-            <span class="stat-val" id="stat-artists">0</span>
-        </div>
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Albums</span>
-            <span class="stat-val" id="stat-albums">0</span>
-        </div>
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Genres</span>
-            <span class="stat-val" id="stat-genres">0</span>
-        </div>
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Projects</span>
-            <span class="stat-val" id="stat-projects">0</span>
-        </div>
-        <div class="stat-card glass-panel">
-            <span class="stat-label">Pending Audio</span>
-            <span class="stat-val" id="stat-pending-audio">0</span>
-        </div>
-    </div>
-
-    <div style="margin-top: 40px;">
-        <h3 style="font-family: var(--font-heading); margin-bottom: 16px;">Quick Actions</h3>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn btn-primary" onclick="switchView('import'); switchImportTab('single');">
-                <i class="fa-solid fa-plus"></i> Add / Import Track
+                <i class="fa-solid fa-plus"></i> Add Track
             </button>
             <button class="btn btn-secondary" onclick="switchView('import'); switchImportTab('spreadsheet');">
-                <i class="fa-solid fa-file-excel"></i> Import Spreadsheet
+                <i class="fa-solid fa-file-excel"></i> Import Sheet
             </button>
             <button class="btn btn-secondary" id="btn-quick-artist">
                 <i class="fa-solid fa-user-plus"></i> New Artist
@@ -62,18 +35,53 @@
             </button>
         </div>
     </div>
+
+    <div class="stats-strip">
+        <div class="stat-item">
+            <span class="stat-label">Total Songs</span>
+            <span class="stat-val" id="stat-songs">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Artists</span>
+            <span class="stat-val" id="stat-artists">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Albums</span>
+            <span class="stat-val" id="stat-albums">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Genres</span>
+            <span class="stat-val" id="stat-genres">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Projects</span>
+            <span class="stat-val" id="stat-projects">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Pending Audio</span>
+            <span class="stat-val" id="stat-pending-audio">0</span>
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+            <h3 class="section-heading" style="margin-bottom: 0;">Recent Tracks</h3>
+            <button class="btn btn-secondary btn-sm" onclick="switchView('songs')">View All</button>
+        </div>
+        <div class="media-grid" id="dashboard-recent-grid"></div>
+    </div>
 </div>
 
 <!-- Songs View -->
 <div id="view-songs" class="view-panel hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+    <div class="view-header">
         <div>
-            <h1 class="view-title">Song Library</h1>
-            <p style="color: var(--text-secondary); font-size: 14px;">All tracks registered in this library folder (including metadata-only entries).</p>
+            <h1 class="view-title">Songs</h1>
+            <p class="view-subtitle">All tracks registered in your library, including metadata-only entries.</p>
         </div>
         <div style="display:flex; gap: 10px;">
             <button class="btn btn-secondary" onclick="switchView('import'); switchImportTab('spreadsheet');">
-                <i class="fa-solid fa-file-csv"></i> Import Spreadsheet
+                <i class="fa-solid fa-file-csv"></i> Import Sheet
             </button>
             <button class="btn btn-primary" onclick="switchView('import'); switchImportTab('single');">
                 <i class="fa-solid fa-plus"></i> Add Song
@@ -84,41 +92,33 @@
     <div class="controls-bar">
         <input type="text" placeholder="Search song, artist, tag..." class="search-input" id="search-songs">
 
-        <div class="filter-selects" style="flex-wrap: wrap;">
-            <select class="select-input" id="filter-tag">
-                <option value="">All Tags</option>
-            </select>
-            <select class="select-input" id="filter-genre">
-                <option value="">All Genres</option>
-            </select>
-            <select class="select-input" id="filter-key">
-                <option value="">All Keys</option>
-            </select>
-            <select class="select-input" id="filter-scale">
-                <option value="">All Scales</option>
-            </select>
+        <div class="filter-selects">
+            <select class="select-input" id="filter-tag"><option value="">All Tags</option></select>
+            <select class="select-input" id="filter-genre"><option value="">All Genres</option></select>
+            <select class="select-input" id="filter-key"><option value="">All Keys</option></select>
+            <select class="select-input" id="filter-scale"><option value="">All Scales</option></select>
             <select class="select-input" id="filter-audio">
-                <option value="">All Audio Status</option>
+                <option value="">All Audio</option>
                 <option value="has">Has Audio</option>
                 <option value="missing">No Audio Yet</option>
             </select>
         </div>
     </div>
 
-    <div class="songs-table-container glass-panel" style="margin-top: 20px;">
+    <div class="songs-table-container">
         <table class="songs-table">
             <thead>
                 <tr>
-                    <th style="width: 50px;"></th>
-                    <th>Song Name</th>
+                    <th style="width: 44px;"></th>
+                    <th>Track</th>
                     <th>Artists</th>
                     <th>Album</th>
                     <th>Genre</th>
                     <th>Tags</th>
-                    <th>Key/Scale</th>
+                    <th>Key</th>
                     <th>BPM</th>
-                    <th>Duration</th>
-                    <th style="width: 110px;">Actions</th>
+                    <th>Time</th>
+                    <th style="width: 110px;"></th>
                 </tr>
             </thead>
             <tbody id="songs-list-body"></tbody>
@@ -128,10 +128,10 @@
 
 <!-- Artists View -->
 <div id="view-artists" class="view-panel hidden">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div class="view-header">
         <div>
             <h1 class="view-title">Artists</h1>
-            <p style="color: var(--text-secondary); font-size: 14px;">Manage artist records and linked production projects.</p>
+            <p class="view-subtitle">Manage artist profiles and linked production projects.</p>
         </div>
         <button class="btn btn-primary" id="btn-add-artist">
             <i class="fa-solid fa-user-plus"></i> Add Artist
@@ -142,10 +142,10 @@
 
 <!-- Albums View -->
 <div id="view-albums" class="view-panel hidden">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div class="view-header">
         <div>
             <h1 class="view-title">Albums</h1>
-            <p style="color: var(--text-secondary); font-size: 14px;">Browse albums and linked production projects.</p>
+            <p class="view-subtitle">Browse albums and linked production projects.</p>
         </div>
         <button class="btn btn-primary" id="btn-add-album">
             <i class="fa-solid fa-compact-disc"></i> Add Album
@@ -156,10 +156,10 @@
 
 <!-- Projects View -->
 <div id="view-projects" class="view-panel hidden">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="view-header">
         <div>
-            <h1 class="view-title">Production Projects</h1>
-            <p style="color: var(--text-secondary); font-size: 14px;">Links to your DAW / music production projects tied to songs, artists, or albums.</p>
+            <h1 class="view-title">Projects</h1>
+            <p class="view-subtitle">DAW and music production projects linked to songs, artists, or albums.</p>
         </div>
         <button class="btn btn-primary" id="btn-add-project">
             <i class="fa-solid fa-link"></i> Link Project
@@ -167,7 +167,7 @@
     </div>
 
     <div class="controls-bar">
-        <input type="text" placeholder="Search project name, path, entity..." class="search-input" id="search-projects">
+        <input type="text" placeholder="Search project name, path, target..." class="search-input" id="search-projects">
         <div class="filter-selects">
             <select class="select-input" id="filter-project-type">
                 <option value="">All Targets</option>
@@ -178,7 +178,7 @@
         </div>
     </div>
 
-    <div class="songs-table-container glass-panel" style="margin-top: 20px;">
+    <div class="songs-table-container">
         <table class="songs-table">
             <thead>
                 <tr>
@@ -186,7 +186,7 @@
                     <th>Target</th>
                     <th>Project Path</th>
                     <th>Notes</th>
-                    <th style="width: 150px;">Actions</th>
+                    <th style="width: 140px;"></th>
                 </tr>
             </thead>
             <tbody id="projects-list-body"></tbody>

@@ -1,18 +1,39 @@
-// Interactive HTML5 Canvas audio waveform decoder & renderer
+// High-density slim-line HTML5 Canvas audio waveform decoder & renderer
 
 const waveformCache = new Map();
-let waveformPeaks = [];
+const RAW_PEAK_RESOLUTION = 2048;
+const BAR_WIDTH = 2;     // Always slim 2px vertical stripe
+const BAR_GAP = 1.5;     // Constant tight gap at any viewport width
+const BAR_PITCH = BAR_WIDTH + BAR_GAP;
+
+let waveformRawPeaks = null;
 let waveformProgress = 0;
 let waveformHoverPct = null;
 let waveformAudioCtx = null;
 let activeWaveformKey = null;
 
-function _defaultPlaceholderPeaks(count = 110) {
-    const arr = [];
+function _placeholderPeaks(count) {
+    const arr = new Array(count);
     for (let i = 0; i < count; i++) {
-        arr.push(0.22 + 0.14 * Math.abs(Math.sin(i * 0.25)));
+        arr[i] = 0.2 + 0.16 * Math.abs(Math.sin(i * 0.22)) + 0.08 * Math.abs(Math.cos(i * 0.57));
     }
     return arr;
+}
+
+function _resamplePeaks(raw, targetCount) {
+    if (!raw || raw.length === 0) return _placeholderPeaks(targetCount);
+    const out = new Array(targetCount);
+    const ratio = raw.length / targetCount;
+    for (let i = 0; i < targetCount; i++) {
+        const start = Math.floor(i * ratio);
+        const end = Math.max(start + 1, Math.min(raw.length, Math.floor((i + 1) * ratio)));
+        let peak = 0;
+        for (let j = start; j < end; j++) {
+            if (raw[j] > peak) peak = raw[j];
+        }
+        out[i] = peak;
+    }
+    return out;
 }
 
 function drawWaveform(progress = waveformProgress) {
@@ -37,35 +58,32 @@ function drawWaveform(progress = waveformProgress) {
 
     const styles = getComputedStyle(document.documentElement);
     const accent = (styles.getPropertyValue('--accent') || '#10b981').trim();
-    const muted = (styles.getPropertyValue('--waveform-muted') || 'rgba(148,163,184,0.28)').trim();
+    const muted = (styles.getPropertyValue('--waveform-muted') || 'rgba(148,163,184,0.26)').trim();
 
-    const peaks = waveformPeaks.length > 0 ? waveformPeaks : _defaultPlaceholderPeaks();
-    const barCount = peaks.length;
-    const step = rect.width / barCount;
-    const barWidth = Math.max(1.5, step * 0.65);
+    // Compute bar count directly from CSS pixel width so stripe width & density stay constant
+    const barCount = Math.max(24, Math.floor(rect.width / BAR_PITCH));
+    const peaks = _resamplePeaks(waveformRawPeaks, barCount);
     const midY = rect.height / 2;
-    const maxHalf = rect.height * 0.45;
+    const maxHalf = rect.height * 0.46;
     const playedX = waveformProgress * rect.width;
 
     for (let i = 0; i < barCount; i++) {
-        const x = i * step + (step - barWidth) / 2;
-        const amp = Math.max(0.1, peaks[i]);
-        const halfH = amp * maxHalf;
-        ctx.fillStyle = (x + barWidth / 2 <= playedX) ? accent : muted;
-        ctx.fillRect(x, midY - halfH, barWidth, halfH * 2);
+        const x = i * BAR_PITCH;
+        const amp = Math.max(0.08, peaks[i]);
+        const halfH = Math.max(1.5, amp * maxHalf);
+        ctx.fillStyle = (x + BAR_WIDTH / 2 <= playedX) ? accent : muted;
+        ctx.fillRect(x, midY - halfH, BAR_WIDTH, halfH * 2);
     }
 
-    // Hover indicator
     if (waveformHoverPct !== null) {
         const hx = waveformHoverPct * rect.width;
         ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-        ctx.fillRect(hx - 0.75, 0, 1.5, rect.height);
+        ctx.fillRect(hx - 0.5, 0, 1, rect.height);
     }
 
-    // Playhead cursor
     if (waveformProgress > 0) {
         ctx.fillStyle = accent;
-        ctx.fillRect(playedX - 1, 0, 2, rect.height);
+        ctx.fillRect(playedX - 0.75, 0, 1.5, rect.height);
     }
 }
 
@@ -74,12 +92,12 @@ async function loadWaveformForUrl(url, cacheKey) {
     waveformProgress = 0;
 
     if (waveformCache.has(cacheKey)) {
-        waveformPeaks = waveformCache.get(cacheKey);
+        waveformRawPeaks = waveformCache.get(cacheKey);
         drawWaveform(0);
         return;
     }
 
-    waveformPeaks = _defaultPlaceholderPeaks();
+    waveformRawPeaks = null;
     drawWaveform(0);
 
     try {
@@ -92,9 +110,9 @@ async function loadWaveformForUrl(url, cacheKey) {
 
         const audioBuf = await waveformAudioCtx.decodeAudioData(arrayBuf.slice(0));
         const channel = audioBuf.getChannelData(0);
-        const samples = 130;
+        const samples = Math.min(RAW_PEAK_RESOLUTION, Math.max(256, channel.length));
         const blockSize = Math.max(1, Math.floor(channel.length / samples));
-        const raw = [];
+        const raw = new Float32Array(samples);
         let maxPeak = 0.001;
 
         for (let i = 0; i < samples; i++) {
@@ -105,15 +123,17 @@ async function loadWaveformForUrl(url, cacheKey) {
                 sumSq += v * v;
             }
             const rms = Math.sqrt(sumSq / blockSize);
-            raw.push(rms);
+            raw[i] = rms;
             if (rms > maxPeak) maxPeak = rms;
         }
 
-        const normalized = raw.map(v => Math.min(1, Math.max(0.08, v / maxPeak)));
-        waveformCache.set(cacheKey, normalized);
+        for (let i = 0; i < samples; i++) {
+            raw[i] = Math.min(1, Math.max(0.08, raw[i] / maxPeak));
+        }
 
+        waveformCache.set(cacheKey, raw);
         if (activeWaveformKey === cacheKey) {
-            waveformPeaks = normalized;
+            waveformRawPeaks = raw;
             const pct = audio.duration ? (audio.currentTime / audio.duration) : 0;
             drawWaveform(pct);
         }
@@ -140,11 +160,9 @@ function setupWaveformInteractions() {
         dragging = true;
         seekFromEvent(e);
     });
-
     window.addEventListener('mousemove', (e) => {
         if (dragging) seekFromEvent(e);
     });
-
     window.addEventListener('mouseup', () => {
         dragging = false;
     });
@@ -154,12 +172,15 @@ function setupWaveformInteractions() {
         waveformHoverPct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
         drawWaveform(waveformProgress);
     });
-
     scrubber.addEventListener('mouseleave', () => {
         waveformHoverPct = null;
         drawWaveform(waveformProgress);
     });
 
+    if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => drawWaveform(waveformProgress));
+        ro.observe(scrubber);
+    }
     window.addEventListener('resize', () => drawWaveform(waveformProgress));
     drawWaveform(0);
 }

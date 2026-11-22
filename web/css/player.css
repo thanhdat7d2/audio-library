@@ -1,12 +1,14 @@
-/* Player Bar (Sticky Bottom — same 80px container height, larger controls & waveform scrubber) */
+/* Player Bar (Sticky Bottom — 80px height, frosted glass, big controls & high-density waveform) */
 .player-bar {
     height: 80px;
     background-color: var(--bg-secondary);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 18px;
     padding: 0 22px;
     z-index: 10;
 }
@@ -16,23 +18,37 @@
     align-items: center;
     gap: 12px;
     width: 20%;
-    min-width: 170px;
+    min-width: 175px;
 }
 
 .player-cover {
-    width: 48px;
-    height: 48px;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.05);
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: var(--bg-input);
     border: 1px solid var(--border-color);
     object-fit: cover;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.player-cover-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
 }
 
 .player-metadata {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     overflow: hidden;
 }
 
@@ -89,7 +105,7 @@
 .player-btn-main {
     font-size: 38px;
     color: var(--accent);
-    filter: drop-shadow(0 0 6px var(--accent-glow));
+    filter: drop-shadow(0 0 8px var(--accent-glow));
 }
 
 .player-btn-main:hover {
@@ -120,7 +136,6 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    border-radius: 4px;
     overflow: hidden;
 }
 
@@ -147,7 +162,7 @@
 .player-volume-bar {
     width: 150px;
     height: 8px;
-    background: rgba(148, 163, 184, 0.22);
+    background: var(--waveform-muted);
     border-radius: 4px;
     cursor: pointer;
     position: relative;

@@ -306,7 +306,7 @@ def get_songs(db_path: str) -> list[dict]:
                    (SELECT COUNT(*)
                     FROM projects p
                     WHERE p.entity_type = 'song' AND p.entity_id = s.song_file) as project_count,
-                   al.album_name, al.slug as album_slug, als.track_number
+                   al.album_name, al.slug as album_slug, al.album_cover, als.track_number
             FROM songs s
             LEFT JOIN keys k ON s.key_id = k.id
             LEFT JOIN scales sc ON s.scale_id = sc.id

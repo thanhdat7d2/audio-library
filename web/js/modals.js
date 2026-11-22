@@ -181,6 +181,22 @@ function openEditSong(songFile) {
         ? (song.audio_file || song.song_file)
         : 'No audio file attached yet';
 
+    const coverImg = document.getElementById('edit-song-cover-img');
+    const coverFallback = document.getElementById('edit-song-cover-fallback');
+    if (coverImg && coverFallback) {
+        coverImg.classList.add('hidden');
+        coverFallback.classList.remove('hidden');
+        coverImg.onload = () => {
+            coverImg.classList.remove('hidden');
+            coverFallback.classList.add('hidden');
+        };
+        coverImg.onerror = () => {
+            coverImg.classList.add('hidden');
+            coverFallback.classList.remove('hidden');
+        };
+        coverImg.src = `/media/song-cover/${encodeURIComponent(songFile)}`;
+    }
+
     selectedEditMainArtists = _parsePairedBadges(song.main_artists, song.main_artists_slugs);
     selectedEditFeatArtists = _parsePairedBadges(song.feat_artists, song.feat_artists_slugs);
     selectedEditGenres = _parsePairedBadges(song.genres, song.genres_ids);

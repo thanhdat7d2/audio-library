@@ -141,6 +141,38 @@ function renderTagPills(tagsStr) {
     }).join('')}</div>`;
 }
 
+function renderDashboardRecent() {
+    const grid = document.getElementById('dashboard-recent-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const recent = songsList.slice(0, 8);
+    if (recent.length === 0) {
+        grid.innerHTML = '<div style="color: var(--text-muted); grid-column: 1/-1; padding: 20px 0;">No tracks yet. Add or import songs to get started.</div>';
+        return;
+    }
+
+    recent.forEach((song) => {
+        const masterIdx = songsList.findIndex(s => s.song_file === song.song_file);
+        const coverUrl = `/media/song-cover/${encodeURIComponent(song.song_file)}`;
+        const card = document.createElement('div');
+        card.className = 'media-card';
+        card.innerHTML = `
+            <div class="media-img" style="display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;">
+                <i class="fa-solid fa-music" style="font-size: 28px; color: var(--text-muted);"></i>
+                <img src="${coverUrl}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()">
+            </div>
+            <div class="media-title">${escapeHtml(song.song_name)}</div>
+            <div class="media-subtitle">${escapeHtml(song.main_artists || 'Unknown Artist')}</div>
+        `;
+        card.addEventListener('click', () => {
+            if (song.has_audio) playSongAtIndex(masterIdx, songsList);
+            else openEditSong(song.song_file);
+        });
+        grid.appendChild(card);
+    });
+}
+
 function renderSongsTable(songs) {
     const body = document.getElementById('songs-list-body');
     body.innerHTML = '';
@@ -155,14 +187,15 @@ function renderSongsTable(songs) {
         const hasAudio = Boolean(song.has_audio);
         const isCurrent = hasAudio && currentIndex >= 0 && currentPlaylist[currentIndex]?.song_file === song.song_file;
         const playIcon = (isCurrent && isPlaying) ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-        const keyScaleStr = (song.key_name || song.scale_name) ? `${song.key_name || ''} ${song.scale_name || ''}`.trim() : 'Unknown';
+        const keyScaleStr = (song.key_name || song.scale_name) ? `${song.key_name || ''} ${song.scale_name || ''}`.trim() : '-';
+        const coverUrl = `/media/song-cover/${encodeURIComponent(song.song_file)}`;
 
         const tr = document.createElement('tr');
         tr.className = isCurrent ? 'playing' : '';
 
         const playCellHtml = hasAudio
             ? `<button class="btn-play-row" data-action="play" title="Play"><i class="${playIcon}"></i></button>`
-            : `<button class="btn-play-row" data-action="attach" title="Attach audio file" style="color: #fcd34d;"><i class="fa-solid fa-upload"></i></button>`;
+            : `<button class="btn-play-row" data-action="attach" title="Attach audio file" style="color: #f59e0b;"><i class="fa-solid fa-upload"></i></button>`;
 
         const noAudioBadge = hasAudio ? '' : `<span class="pill-badge pill-no-audio">No Audio</span>`;
         const projectBadge = song.project_count > 0
@@ -171,16 +204,26 @@ function renderSongsTable(songs) {
 
         tr.innerHTML = `
             <td>${playCellHtml}</td>
-            <td style="font-weight: 500;">${escapeHtml(song.song_name)}${noAudioBadge}</td>
-            <td>${escapeHtml(song.main_artists || 'Unknown Artist')} ${song.feat_artists ? `<span style="color: var(--text-secondary); font-size:12px;">(feat. ${escapeHtml(song.feat_artists)})</span>` : ''}</td>
-            <td>${escapeHtml(song.album_name || '-')}</td>
-            <td>${escapeHtml(song.genres || '-')}</td>
-            <td>${renderTagPills(song.tags)}</td>
-            <td>${escapeHtml(keyScaleStr)}</td>
-            <td>${song.tempo || '-'}</td>
-            <td>${hasAudio ? formatTime(song.duration || 0) : '-'}</td>
             <td>
-                <div style="display:flex; align-items:center; gap: 6px;">
+                <div class="song-title-cell">
+                    <div class="song-row-cover-wrap">
+                        <i class="fa-solid fa-music song-row-cover-fallback"></i>
+                        <img src="${coverUrl}" class="song-row-cover" style="position:absolute; inset:0;" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()" loading="lazy">
+                    </div>
+                    <div style="min-width:0;">
+                        <span class="song-title-text" style="font-weight: 500;">${escapeHtml(song.song_name)}</span>${noAudioBadge}
+                    </div>
+                </div>
+            </td>
+            <td>${escapeHtml(song.main_artists || 'Unknown Artist')} ${song.feat_artists ? `<span style="color: var(--text-secondary); font-size:12px;">(feat. ${escapeHtml(song.feat_artists)})</span>` : ''}</td>
+            <td style="color: var(--text-secondary);">${escapeHtml(song.album_name || '-')}</td>
+            <td style="color: var(--text-secondary);">${escapeHtml(song.genres || '-')}</td>
+            <td>${renderTagPills(song.tags)}</td>
+            <td style="color: var(--text-secondary);">${escapeHtml(keyScaleStr)}</td>
+            <td style="color: var(--text-secondary);">${song.tempo || '-'}</td>
+            <td style="color: var(--text-secondary); font-family: monospace;">${hasAudio ? formatTime(song.duration || 0) : '-'}</td>
+            <td>
+                <div style="display:flex; align-items:center; gap: 6px; justify-content: flex-end;">
                     ${projectBadge}
                     <button class="btn-secondary btn btn-sm" data-action="link-project" title="Link production project"><i class="fa-solid fa-link"></i></button>
                     <button class="btn-secondary btn btn-sm" data-action="edit" title="Edit song"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -228,7 +271,7 @@ function renderArtistsView() {
             : '';
 
         const card = document.createElement('div');
-        card.className = 'media-card media-card-artist glass-panel';
+        card.className = 'media-card media-card-artist';
         card.style.position = 'relative';
         card.innerHTML = `
             ${projBadge}
@@ -271,7 +314,7 @@ function renderAlbumsView() {
             : '';
 
         const card = document.createElement('div');
-        card.className = 'media-card glass-panel';
+        card.className = 'media-card';
         card.style.position = 'relative';
         card.innerHTML = `
             ${projBadge}

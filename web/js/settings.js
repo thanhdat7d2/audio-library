@@ -1,6 +1,7 @@
-// Settings view (Library Path & Theme) persisted to app_settings.json
+// Settings view (Library Path, Theme, Sidebar collapse state) persisted to app_settings.json
 
 let currentTheme = 'emerald-dark';
+let sidebarCollapsed = false;
 
 function applyTheme(themeId) {
     const valid = themeId || 'emerald-dark';
@@ -11,8 +12,16 @@ function applyTheme(themeId) {
         card.classList.toggle('active', card.getAttribute('data-theme-id') === valid);
     });
 
-    if (typeof drawWaveform === 'function') {
-        drawWaveform(waveformProgress);
+    requestAnimationFrame(() => {
+        if (typeof drawWaveform === 'function') drawWaveform(waveformProgress);
+    });
+}
+
+function applySidebarState(collapsed) {
+    sidebarCollapsed = Boolean(collapsed);
+    const sidebar = document.getElementById('app-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
     }
 }
 
@@ -20,6 +29,7 @@ async function loadAppSettings() {
     const settings = await window.pywebview.api.get_settings();
     if (settings) {
         applyTheme(settings.theme || 'emerald-dark');
+        applySidebarState(Boolean(settings.sidebar_collapsed));
         const pathInput = document.getElementById('settings-library-path');
         if (pathInput) pathInput.value = settings.library_path || '';
     }
@@ -34,6 +44,14 @@ function renderSettingsView() {
 }
 
 function setupSettingsListeners() {
+    const toggleBtn = document.getElementById('btn-toggle-sidebar');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', async () => {
+            applySidebarState(!sidebarCollapsed);
+            await window.pywebview.api.update_settings({ sidebar_collapsed: sidebarCollapsed });
+        });
+    }
+
     document.querySelectorAll('#settings-theme-grid .theme-card').forEach(card => {
         card.addEventListener('click', async () => {
             const themeId = card.getAttribute('data-theme-id');

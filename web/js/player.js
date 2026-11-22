@@ -32,15 +32,17 @@ function playSongAtIndex(index, playlist = songsList) {
     const currentCover = document.getElementById('current-cover');
     const placeholderCover = document.getElementById('player-placeholder-cover');
 
-    const albumObj = (metadataOptions.albums || []).find(a => a.album_name === song.album_name);
-    if (albumObj && albumObj.album_cover) {
-        currentCover.src = `/media/${albumObj.album_cover}`;
+    currentCover.classList.add('hidden');
+    placeholderCover.classList.remove('hidden');
+    currentCover.onload = () => {
         currentCover.classList.remove('hidden');
         placeholderCover.classList.add('hidden');
-    } else {
+    };
+    currentCover.onerror = () => {
         currentCover.classList.add('hidden');
         placeholderCover.classList.remove('hidden');
-    }
+    };
+    currentCover.src = `/media/song-cover/${encodeURIComponent(song.song_file)}`;
 
     updatePlayerButtonState();
     renderSongsTable(getFilteredSongs());

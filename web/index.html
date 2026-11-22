@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="emerald-dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +10,8 @@
 <body>
 
     <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <!-- Hideable Sidebar Navigation -->
+        <aside class="sidebar" id="app-sidebar">
             <nav style="flex: 1;">
                 <ul class="nav-menu">
                     <li class="nav-item active" data-view="dashboard">
@@ -51,6 +51,12 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
+            <div class="topbar">
+                <button type="button" class="btn-icon-ghost" id="btn-toggle-sidebar" title="Toggle Sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
             <!-- include:partials/views_catalog.html -->
             <!-- include:partials/views_import.html -->
             <!-- include:partials/views_settings.html -->
@@ -61,8 +67,8 @@
     <footer class="player-bar">
         <div class="player-track-info">
             <img src="" class="player-cover hidden" id="current-cover">
-            <div style="width: 48px; height: 48px; border-radius: 6px; background-color: rgba(255,255,255,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="player-placeholder-cover">
-                <i class="fa-solid fa-music" style="color: var(--text-muted);"></i>
+            <div class="player-cover-placeholder" id="player-placeholder-cover">
+                <i class="fa-solid fa-music"></i>
             </div>
             <div class="player-metadata">
                 <span class="player-track-name" id="current-title">Select a song to play</span>
